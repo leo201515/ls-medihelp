@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Einstellungen - MediHelp{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="text-center mb-5">
+            <h1 class="mb-3">Einstellungen</h1>
+            <p class="text-muted">Passen Sie die App an Ihre Bedürfnisse an</p>
+        </div>
+
+        <div class="card shadow-lg mb-4">
+            <div class="card-body p-4 p-md-5">
+                <div class="section-title mb-4">
+                    <div class="icon-badge">🤖</div>
+                    <h5 class="mb-0">KI-Einstellungen</h5>
+                </div>
+
+                <div class="mb-4">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="useAi" {% if use_ai %}checked{% endif %}>
+                        <label class="form-check-label" for="useAi">
+                            <strong>KI-Antworten aktivieren</strong>
+                            <br><small class="text-muted">Wenn aktiviert, wird eine KI für dynamische Antworten verwendet. Andernfalls wird das regelbasierte System verwendet.</small>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mb-4" id="apiKeySection">
+                    <label for="apiKey" class="form-label">Hugging Face API-Schlüssel (optional)</label>
+                    <input type="password" class="form-control" id="apiKey" value="{{ api_key }}" placeholder="hf_xxxxxxxxxxxx">
+                    <small class="text-muted">
+                        Kostenlos unter <a href="https://huggingface.co/settings/tokens" target="_blank">huggingface.co/settings/tokens</a> erhältlich
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-lg mb-4">
+            <div class="card-body p-4 p-md-5">
+                <div class="section-title mb-4">
+                    <div class="icon-badge">🌐</div>
+                    <h5 class="mb-0">Spracheinstellungen</h5>
+                </div>
+
+                <div class="mb-4">
+                    <label for="language" class="form-label">Bevorzugte Sprache</label>
+                    <select class="form-select" id="language">
+                        <option value="de" {% if language == 'de' %}selected{% endif %}>Deutsch</option>
+                        <option value="en" {% if language == 'en' %}selected{% endif %}>English</option>
+                        <option value="nl" {% if language == 'nl' %}selected{% endif %}>Nederlands</option>
+                        <option value="fr" {% if language == 'fr' %}selected{% endif %}>Français</option>
+                        <option value="es" {% if language == 'es' %}selected{% endif %}>Español</option>
+                        <option value="si" {% if language == 'si' %}selected{% endif %}>සිංහල</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <button type="button" class="btn btn-primary w-100 mb-3" onclick="saveSettings()">
+            <span style="margin-right: 0.5rem;">💾</span>
+            Einstellungen speichern
+        </button>
+
+        <div id="successMessage" class="alert alert-success d-none" role="alert">
+            Einstellungen erfolgreich gespeichert!
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function saveSettings() {
+    const useAi = document.getElementById('useAi').checked;
+    const apiKey = document.getElementById('apiKey').value;
+    const language = document.getElementById('language').value;
+
+    fetch('/save-settings', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            use_ai: useAi,
+            api_key: apiKey,
+            language: language
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('successMessage').classList.remove('d-none');
+            setTimeout(() => {
+                document.getElementById('successMessage').classList.add('d-none');
+            }, 3000);
+        }
+    })
+    .catch(error => {
+        alert('Fehler beim Speichern der Einstellungen');
+    });
+}
+</script>
+{% endblock %}

@@ -9,6 +9,10 @@
 *.sqlite
 *.sqlite3
 
+# Uploaded files
+uploads/*
+!uploads/.gitkeep
+
 # APK files
 *.apk
 *.aab

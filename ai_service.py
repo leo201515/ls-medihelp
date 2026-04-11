@@ -6,31 +6,36 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Free AI service using Hugging Face Inference API
-# Get your free API key at: https://huggingface.co/settings/tokens
-# Free tier: Limited requests per month
+HF_API_KEY = os.getenv('HF_API_KEY', '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')
+HF_API_URL = "https://router.huggingface.co/hf-inference/models/microsoft/DialoGPT-medium"
+BACKUP_HF_API_URL = "https://router.huggingface.co/hf-inference/models/facebook/blenderbot-400M-distill"
 
-HF_API_KEY = os.getenv('HF_API_KEY', '')
+_user_settings = {'use_ai': False, 'api_key': ''}
 
-# Use a free text generation model
-# Options: mistralai/Mistral-7B-Instruct-v0.2, meta-llama/Llama-2-7b-chat-hf, etc.
-# Using a model that works with free inference API
-HF_API_URL = "https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium"
-BACKUP_HF_API_URL = "https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill"
+def set_user_settings(use_ai, api_key):
+    global _user_settings
+    _user_settings['use_ai'] = use_ai
+    _user_settings['api_key'] = api_key
 
-def get_medical_advice(symptoms):
-    """
-    Get medical advice using free rule-based system (FAST)
-    """
-    
-    # Detect language
+def get_medical_advice(symptoms, language='de'):
     german_words = ['ich', 'habe', 'schmerzen', 'kopfschmerzen', 'fieber', 'husten', 'erkältung', 
                    'bauch', 'hals', 'schmerz', 'weh', 'kalt', 'heiß', 'müde', 'übel', 'nicht',
                    'art', 'und', 'der', 'die', 'ist', 'bin', 'sind']
     symptoms_lower = symptoms.lower()
-    is_german = any(word in symptoms_lower for word in german_words)
+    is_german = any(word in symptoms_lower for word in german_words) or language == 'de'
+    
+    api_key = _user_settings.get('api_key') or HF_API_KEY
+    use_ai = _user_settings.get('use_ai', False)
+    
+    if use_ai and api_key:
+        try:
+            return get_hf_advice(symptoms, is_german, api_key)
+        except Exception as e:
+            print(f"[INFO] AI API failed, using rule-based: {e}")
+    
+    return get_rule_based_advice(symptoms, is_german)
 
-def get_hf_advice(symptoms, is_german):
+def get_hf_advice(symptoms, is_german, api_key):
     """Use Hugging Face free inference API"""
     
     if is_german:
@@ -49,7 +54,7 @@ Doctor: As a medical assistant, I recommend these general measures:
 """
     
     headers = {
-        "Authorization": f"Bearer {HF_API_KEY}",
+        "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
     }
     
