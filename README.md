@@ -41,15 +41,40 @@ This app works completely **FREE** with two options:
 - German pharmacy products
 - Completely free - works without API keys!
 
-## Quick Start
+## Installation on Ubuntu (Terminal)
 
-### Web App
-
+### Prerequisites
 ```bash
-# Install dependencies (if not already installed)
-pip3 install --break-system-packages flask python-dotenv requests
+# Update system
+sudo apt update && sudo apt upgrade -y
 
-# Run the app
+# Install Python3 and pip (if not installed)
+sudo apt install python3 python3-pip -y
+
+# Install Git (if not installed)
+sudo apt install git -y
+```
+
+### Clone and Run
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/medical_apk.git
+cd medical_apk
+
+# Create virtual environment
+python3 -m venv venv
+
+# Activate virtual environment
+source venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# (Optional) Configure .env file
+cp .env.example .env
+# Edit .env to add HF_API_KEY if desired
+
+# Run the web app
 python3 app.py
 
 # Open in browser
