@@ -83,4 +83,7 @@ def history():
     return render_template('history.html', consultations=consultations)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8083, debug=True)
+    import ssl
+    context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    context.load_cert_chain('cert.pem', 'key.pem')
+    app.run(host='0.0.0.0', port=8083, debug=True, ssl_context=context)

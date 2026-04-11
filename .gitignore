@@ -3,6 +3,9 @@
 .env.local
 .env.*.local
 
+# SSL certificates
+*.pem
+
 # Database files
 *.db
 *.db-journal
