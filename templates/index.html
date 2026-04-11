@@ -121,6 +121,18 @@ async function openCamera() {
     const cameraContainer = document.getElementById('cameraContainer');
     const video = document.getElementById('cameraVideo');
     
+    // Check if getUserMedia is available
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert('Kamera wird in diesem Browser nicht unterstützt. Bitte verwenden Sie "Datei auswählen" oder greifen Sie über HTTPS zu.');
+        return;
+    }
+    
+    // Check for HTTPS requirement
+    if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+        alert('Kamera erfordert HTTPS. Bitte verwenden Sie "Datei auswählen" um ein Bild hochzuladen, oder greifen Sie über http://localhost:8083 zu.');
+        return;
+    }
+    
     try {
         cameraStream = await navigator.mediaDevices.getUserMedia({ 
             video: { facingMode: 'environment' }, 
@@ -129,7 +141,13 @@ async function openCamera() {
         video.srcObject = cameraStream;
         cameraContainer.classList.remove('d-none');
     } catch (err) {
-        alert('Kamera nicht verfügbar: ' + err.message);
+        if (err.name === 'NotAllowedError') {
+            alert('Kamera-Zugriff verweigert. Bitte erlauben Sie den Kamera-Zugriff in Ihrem Browser.');
+        } else if (err.name === 'NotFoundError') {
+            alert('Keine Kamera gefunden. Bitte verwenden Sie "Datei auswählen".');
+        } else {
+            alert('Kamera nicht verfügbar: ' + err.message + '\n\nBitte verwenden Sie "Datei auswählen" um ein Bild hochzuladen.');
+        }
     }
 }
 
