@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}MediHelp - Beratungsverlauf{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="text-center mb-5">
+            <h1 class="mb-3">Beratungsverlauf</h1>
+            <p class="text-muted lead">
+                Ihre vorherigen medizinischen Beratungen
+            </p>
+        </div>
+
+        {% if consultations %}
+            {% for consult in consultations %}
+            <div class="card mb-4 history-card">
+                <div class="card-header">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-badge me-3" style="background: rgba(255,255,255,0.2); width: 36px; height: 36px; font-size: 1rem;">
+                            📅
+                        </div>
+                        <span style="font-weight: 500;">{{ consult.created_at }}</span>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-4">
+                        <div class="section-title">
+                            <div class="icon-badge">📝</div>
+                            <h6 class="mb-0">Ihre Symptome:</h6>
+                        </div>
+                        <div class="symptom-text">
+                            <p class="mb-0">{{ consult.symptoms }}</p>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="section-title">
+                            <div class="icon-badge" style="background: var(--secondary-gradient);">✓</div>
+                            <h6 class="mb-0">Empfehlungen:</h6>
+                        </div>
+                        <div class="response-text">
+                            {{ consult.ai_response }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="card shadow-lg">
+                <div class="card-body p-5">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <h2 class="mb-3">Noch keine Beratungen</h2>
+                        <p class="text-muted mb-4">
+                            Sie haben noch keine medizinische Beratung durchgeführt.<br>
+                            Starten Sie jetzt Ihre erste Konsultation!
+                        </p>
+                        <a href="/" class="btn btn-primary btn-lg">
+                            <span style="margin-right: 0.5rem;">🔬</span>
+                            Beratung starten
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
