@@ -27,6 +27,7 @@ def allowed_file(filename):
 def index():
     if 'session_id' not in session:
         session['session_id'] = str(uuid.uuid4())
+    session.setdefault('use_ai', True)
     return render_template('index.html', language=session.get('language', 'de'))
 
 @app.route('/settings')
@@ -34,8 +35,8 @@ def settings():
     if 'session_id' not in session:
         session['session_id'] = str(uuid.uuid4())
     return render_template('settings.html',
-        use_ai=session.get('use_ai', False),
-        api_key=session.get('api_key', ''),
+        use_ai=session.get('use_ai', True),
+        api_key='',
         language=session.get('language', 'de'))
 
 @app.route('/save-settings', methods=['POST'])

@@ -10,11 +10,11 @@ HF_API_KEY = os.getenv('HF_API_KEY', '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')
 HF_API_URL = "https://router.huggingface.co/hf-inference/models/microsoft/DialoGPT-medium"
 BACKUP_HF_API_URL = "https://router.huggingface.co/hf-inference/models/facebook/blenderbot-400M-distill"
 
-_user_settings = {'use_ai': False, 'api_key': ''}
+_user_settings = {'use_ai': True, 'api_key': ''}
 
 def set_user_settings(use_ai, api_key):
     global _user_settings
-    _user_settings['use_ai'] = use_ai
+    _user_settings['use_ai'] = use_ai if use_ai is not None else True
     _user_settings['api_key'] = api_key
 
 def get_medical_advice(symptoms, language='de'):
@@ -25,7 +25,7 @@ def get_medical_advice(symptoms, language='de'):
     is_german = any(word in symptoms_lower for word in german_words) or language == 'de'
     
     api_key = _user_settings.get('api_key') or HF_API_KEY
-    use_ai = _user_settings.get('use_ai', False)
+    use_ai = _user_settings.get('use_ai', True)
     
     if use_ai and api_key:
         try:
