@@ -54,10 +54,6 @@
             <span style="margin-right: 0.5rem;">💾</span>
             Einstellungen speichern
         </button>
-
-        <div id="successMessage" class="alert alert-success d-none" role="alert">
-            Einstellungen erfolgreich gespeichert!
-        </div>
     </div>
 </div>
 {% endblock %}
@@ -66,7 +62,6 @@
 <script>
 function saveSettings() {
     const useAi = document.getElementById('useAi').checked;
-    const apiKey = document.getElementById('apiKey').value;
     const language = document.getElementById('language').value;
 
     fetch('/save-settings', {
@@ -76,17 +71,13 @@ function saveSettings() {
         },
         body: JSON.stringify({
             use_ai: useAi,
-            api_key: apiKey,
             language: language
         })
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            document.getElementById('successMessage').classList.remove('d-none');
-            setTimeout(() => {
-                document.getElementById('successMessage').classList.add('d-none');
-            }, 3000);
+            window.location.href = '/';
         }
     })
     .catch(error => {
