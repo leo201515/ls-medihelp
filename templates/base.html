@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,17 +23,17 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}" href="/">
-                            <span>💬</span> Beratung
+                            <span>💬</span> Consultation
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.endpoint == 'history' %}active{% endif %}" href="/history">
-                            <span>📋</span> Verlauf
+                            <span>📋</span> History
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.endpoint == 'settings' %}active{% endif %}" href="/settings">
-                            <span>⚙️</span> Einstellungen
+                            <span>⚙️</span> Settings
                         </a>
                     </li>
                 </ul>
@@ -50,12 +50,12 @@
             <div class="row align-items-center">
                 <div class="col-md-6 text-center text-md-start">
                     <span class="text-muted">
-                        <strong>MediHelp</strong> - Ihre digitale Gesundheitsberatung
+                        <strong>MediHelp</strong> - Your Digital Health Consultation
                     </span>
                 </div>
                 <div class="col-md-6 text-center text-md-end mt-2 mt-md-0">
                     <span class="text-muted" style="font-size: 0.85rem;">
-                        ⚠️ Dies ist keine medizinische Beratung. Konsultieren Sie immer einen Arzt.
+                        ⚠️ This is not medical advice. Always consult a doctor.
                     </span>
                 </div>
             </div>

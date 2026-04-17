@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for, send_file
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 import uuid
@@ -28,7 +28,7 @@ def index():
     if 'session_id' not in session:
         session['session_id'] = str(uuid.uuid4())
     session.setdefault('use_ai', True)
-    return render_template('index.html', language=session.get('language', 'de'))
+    return render_template('index.html', language=session.get('language', 'en'))
 
 @app.route('/settings')
 def settings():
@@ -37,7 +37,7 @@ def settings():
     return render_template('settings.html',
         use_ai=session.get('use_ai', True),
         api_key='',
-        language=session.get('language', 'de'))
+        language=session.get('language', 'en'))
 
 @app.route('/save-settings', methods=['POST'])
 def save_settings():
@@ -50,6 +50,8 @@ def save_settings():
 
 @app.route('/consult', methods=['POST'])
 def consult():
+    if 'session_id' not in session:
+        session['session_id'] = str(uuid.uuid4())
     symptoms = request.form.get('symptoms', '').strip()
     photo_path = None
     
@@ -64,7 +66,7 @@ def consult():
             file.save(filepath)
             photo_path = filepath
     
-    use_ai = session.get('use_ai', False)
+    use_ai = session.get('use_ai', True)
     api_key = session.get('api_key', '')
     language = session.get('language', 'de')
     
@@ -82,8 +84,9 @@ def history():
     consultations = get_history(session.get('session_id', ''))
     return render_template('history.html', consultations=consultations)
 
+@app.route('/download-apk')
+def download_apk():
+    return send_file('MediHelp.apk', as_attachment=True, download_name='MediHelp.apk')
+
 if __name__ == '__main__':
-    import ssl
-    context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-    context.load_cert_chain('cert.pem', 'key.pem')
-    app.run(host='0.0.0.0', port=8083, debug=True, ssl_context=context)
+    app.run(host='0.0.0.0', port=8084, debug=True)

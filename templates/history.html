@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 
-{% block title %}MediHelp - Beratungsverlauf{% endblock %}
+{% block title %}MediHelp - Consultation History{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-lg-10">
         <div class="text-center mb-5">
-            <h1 class="mb-3">Beratungsverlauf</h1>
+            <h1 class="mb-3">Consultation History</h1>
             <p class="text-muted lead">
-                Ihre vorherigen medizinischen Beratungen
+                Your previous medical consultations
             </p>
         </div>
 
@@ -27,7 +27,7 @@
                     <div class="mb-4">
                         <div class="section-title">
                             <div class="icon-badge">📝</div>
-                            <h6 class="mb-0">Ihre Symptome:</h6>
+                            <h6 class="mb-0">Your Symptoms:</h6>
                         </div>
                         <div class="symptom-text">
                             <p class="mb-0">{{ consult.symptoms }}</p>
@@ -36,7 +36,7 @@
                     <div>
                         <div class="section-title">
                             <div class="icon-badge" style="background: var(--secondary-gradient);">✓</div>
-                            <h6 class="mb-0">Empfehlungen:</h6>
+                            <h6 class="mb-0">Recommendations:</h6>
                         </div>
                         <div class="response-text">
                             {{ consult.ai_response }}
@@ -50,14 +50,14 @@
                 <div class="card-body p-5">
                     <div class="empty-state">
                         <div class="empty-state-icon">📋</div>
-                        <h2 class="mb-3">Noch keine Beratungen</h2>
+                        <h2 class="mb-3">No consultations yet</h2>
                         <p class="text-muted mb-4">
-                            Sie haben noch keine medizinische Beratung durchgeführt.<br>
-                            Starten Sie jetzt Ihre erste Konsultation!
+                            You haven't had any medical consultations yet.<br>
+                            Start your first consultation now!
                         </p>
                         <a href="/" class="btn btn-primary btn-lg">
                             <span style="margin-right: 0.5rem;">🔬</span>
-                            Beratung starten
+                            Start Consultation
                         </a>
                     </div>
                 </div>

@@ -6,9 +6,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-HF_API_KEY = os.getenv('HF_API_KEY', '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')
-HF_API_URL = "https://router.huggingface.co/hf-inference/models/microsoft/DialoGPT-medium"
-BACKUP_HF_API_URL = "https://router.huggingface.co/hf-inference/models/facebook/blenderbot-400M-distill"
+HF_API_KEY = os.getenv('HF_API_KEY', '')
+OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY', '')
+API_URL = "https://openrouter.ai/api/v1/chat/completions"
+MODEL = "nvidia/nemotron-nano-9b-v2:free"
 
 _user_settings = {'use_ai': True, 'api_key': ''}
 
@@ -17,41 +18,21 @@ def set_user_settings(use_ai, api_key):
     _user_settings['use_ai'] = use_ai if use_ai is not None else True
     _user_settings['api_key'] = api_key
 
-def get_medical_advice(symptoms, language='de'):
-    german_words = ['ich', 'habe', 'schmerzen', 'kopfschmerzen', 'fieber', 'husten', 'erkältung', 
-                   'bauch', 'hals', 'schmerz', 'weh', 'kalt', 'heiß', 'müde', 'übel', 'nicht',
-                   'art', 'und', 'der', 'die', 'ist', 'bin', 'sind']
-    symptoms_lower = symptoms.lower()
-    is_german = any(word in symptoms_lower for word in german_words) or language == 'de'
-    
-    api_key = _user_settings.get('api_key') or HF_API_KEY
+def get_medical_advice(symptoms, language='en'):
     use_ai = _user_settings.get('use_ai', True)
+    api_key = OPENROUTER_API_KEY or _user_settings.get('api_key', '')
     
     if use_ai and api_key:
         try:
-            return get_hf_advice(symptoms, is_german, api_key)
+            return get_openrouter_advice(symptoms, False, api_key)
         except Exception as e:
             print(f"[INFO] AI API failed, using rule-based: {e}")
     
-    return get_rule_based_advice(symptoms, is_german)
+    return get_rule_based_advice(symptoms, False)
 
-def get_hf_advice(symptoms, is_german, api_key):
-    """Use Hugging Face free inference API"""
-    
-    if is_german:
-        prompt = f"""Patient: {symptoms}
-
-Arzt: Als medizinischer Assistent empfehle ich folgende allgemeine Maßnahmen:
-
-1. Symptom-Analyse:
-"""
-    else:
-        prompt = f"""Patient: {symptoms}
-
-Doctor: As a medical assistant, I recommend these general measures:
-
-1. Symptom Analysis:
-"""
+def get_openrouter_advice(symptoms, is_german, api_key):
+    system_prompt = "You are a medical assistant. Give brief, helpful advice. Always recommend seeing a doctor for serious symptoms."
+    user_prompt = f"Symptoms: {symptoms}\n\nWhat helps?"
     
     headers = {
         "Authorization": f"Bearer {api_key}",
@@ -59,68 +40,24 @@ Doctor: As a medical assistant, I recommend these general measures:
     }
     
     payload = {
-        "inputs": prompt,
-        "parameters": {
-            "max_length": 300,
-            "temperature": 0.7,
-            "top_p": 0.95,
-            "do_sample": True,
-            "return_full_text": False
-        },
-        "options": {
-            "wait_for_model": True
-        }
+        "model": MODEL,
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ],
+        "max_tokens": 500
     }
     
-    try:
-        # Try primary model
-        response = requests.post(HF_API_URL, headers=headers, json=payload, timeout=30)
-        
-        if response.status_code == 503:
-            # Model is loading, try backup
-            print(f"[INFO] Primary model loading, trying backup...")
-            response = requests.post(BACKUP_HF_API_URL, headers=headers, json=payload, timeout=30)
-        
-        if response.status_code == 200:
-            result = response.json()
-            if isinstance(result, list) and len(result) > 0:
-                generated_text = result[0].get('generated_text', '')
-                if generated_text:
-                    # Combine with prompt and format
-                    full_advice = prompt + generated_text
-                    return format_ai_response(full_advice, is_german)
-        
-        print(f"[WARN] API returned status {response.status_code}: {response.text[:200]}")
-        
-    except requests.exceptions.Timeout:
-        print(f"[WARN] API request timed out")
-    except requests.exceptions.RequestException as e:
-        print(f"[WARN] API request failed: {e}")
-    except Exception as e:
-        print(f"[WARN] Unexpected error: {e}")
+    response = requests.post(API_URL, headers=headers, json=payload, timeout=30)
     
-    # If we get here, API failed
-    raise Exception("API call failed")
-
-def format_ai_response(text, is_german):
-    """Format the AI response with proper structure"""
+    if response.status_code == 200:
+        result = response.json()
+        advice = result.get('choices', [{}])[0].get('message', {}).get('content', '')
+        if advice:
+            disclaimer = "\n\n⚠️ **Wichtiger Hinweis:** Dies ist keine ärztliche Beratung." if is_german else "\n\n⚠️ **Important:** This is not medical advice."
+            return advice + disclaimer
     
-    # Add disclaimer
-    disclaimer_german = "\n\n⚠️ **Wichtiger Hinweis:** Dies ist keine ärztliche Beratung. Bei schweren oder anhaltenden Symptomen konsultieren Sie bitte einen Arzt."
-    disclaimer_english = "\n\n⚠️ **Important Notice:** This is not medical advice. For serious or persistent symptoms, please consult a doctor."
-    
-    # Clean up the text
-    formatted = text.strip()
-    
-    # Add disclaimer
-    if is_german:
-        if "wichtiger hinweis" not in formatted.lower():
-            formatted += disclaimer_german
-    else:
-        if "important notice" not in formatted.lower():
-            formatted += disclaimer_english
-    
-    return formatted
+    raise Exception(f"API returned {response.status_code}: {response.text[:200]}")
 
 def get_rule_based_advice(symptoms, is_german):
     """Rule-based medical advice system (completely free, works offline)"""
