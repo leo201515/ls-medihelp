@@ -1,3 +1,13 @@
+"""
+MediHelp - Medical Consultation Application
+Copyright (c) 2025 Leo Somaratne. All rights reserved.
+"""
+
+"""
+MediHelp - Medical Consultation Application
+Copyright (c) 2026 Leo Somaratne. All rights reserved.
+"""
+
 import os
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for, send_file
 from werkzeug.utils import secure_filename

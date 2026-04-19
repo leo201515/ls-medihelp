@@ -1,3 +1,13 @@
+"""
+MediHelp - Database Module
+Copyright (c) 2025 Leo Somaratne. All rights reserved.
+"""
+
+"""
+MediHelp - Database Module
+Copyright (c) 2026 Leo Somaratne. All rights reserved.
+"""
+
 import sqlite3
 from datetime import datetime
 import os

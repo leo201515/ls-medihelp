@@ -1,3 +1,13 @@
+"""
+MediHelp - AI Service Module
+Copyright (c) 2025 Leo Somaratne. All rights reserved.
+"""
+
+"""
+MediHelp - AI Service Module
+Copyright (c) 2026 Leo Somaratne. All rights reserved.
+"""
+
 import os
 import requests
 import json
@@ -23,12 +33,9 @@ def get_medical_advice(symptoms, language='en'):
     api_key = OPENROUTER_API_KEY or _user_settings.get('api_key', '')
     
     if use_ai and api_key:
-        try:
-            return get_openrouter_advice(symptoms, False, api_key)
-        except Exception as e:
-            print(f"[INFO] AI API failed, using rule-based: {e}")
+        return get_openrouter_advice(symptoms, language == 'de', api_key)
     
-    return get_rule_based_advice(symptoms, False)
+    return "Bitte konfigurieren Sie einen API-Schlüssel in den Einstellungen, um medizinische Beratung zu erhalten."
 
 def get_openrouter_advice(symptoms, is_german, api_key):
     system_prompt = "You are a medical assistant. Give brief, helpful advice. Always recommend seeing a doctor for serious symptoms."

@@ -1,0 +1,14 @@
+[Unit]
+Description=MediHelp Flask Application
+After=network.target
+
+[Service]
+Type=simple
+User=leo
+WorkingDirectory=/home/leo/ls-medihelp
+ExecStart=/usr/bin/python3 /home/leo/ls-medihelp/app.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
