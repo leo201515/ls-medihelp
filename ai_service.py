@@ -61,7 +61,7 @@ def get_openrouter_advice(symptoms, is_german, api_key):
         result = response.json()
         advice = result.get('choices', [{}])[0].get('message', {}).get('content', '')
         if advice:
-            disclaimer = "\n\n⚠️ **Wichtiger Hinweis:** Dies ist keine ärztliche Beratung." if is_german else "\n\n⚠️ **Important:** This is not medical advice."
+            disclaimer = "\n\n⚠️ **Important:** This is not medical advice. Please consult a doctor if symptoms persist."
             return advice + disclaimer
     
     raise Exception(f"API returned {response.status_code}: {response.text[:200]}")
@@ -112,7 +112,7 @@ def get_german_advice(symptoms):
 - Bei neurologischen Symptomen (Sehstörungen, Sprachstörungen)
 - Kopfschmerzen die über Tage schlimmer werden
 
-**⚠️ Wichtiger Hinweis:** Dies ist keine medizinische Beratung. Bei anhaltenden Beschwerden konsultieren Sie bitte einen Arzt.
+**⚠️ Important:** This is not medical advice. Please consult a doctor if symptoms persist.
 """
     
     elif any(word in symptoms for word in ['fieber', 'erhöht', 'temperatur', 'warm', 'heiß', 'fieberhaft']):
@@ -142,7 +142,7 @@ def get_german_advice(symptoms):
 - Bei Kindern unter 3 Jahren mit Fieber
 - Zusätzliche Symptome wie Atemnot, Hautausschlag
 
-**⚠️ Wichtiger Hinweis:** Dies ist keine medizinische Beratung. Bei anhaltenden Beschwerden konsultieren Sie bitte einen Arzt.
+**⚠️ Important:** This is not medical advice. Please consult a doctor if symptoms persist.
 """
     
     elif any(word in symptoms for word in ['husten', 'hals', 'erkältung', 'schnupfen', 'nase', 'erkältet', 'halsweh']):
@@ -181,7 +181,7 @@ def get_german_advice(symptoms):
 - Eitriger Auswurf
 - Starke Halsschmerzen
 
-**⚠️ Wichtiger Hinweis:** Dies ist keine medizinische Beratung. Bei anhaltenden Beschwerden konsultatieren Sie bitte einen Arzt.
+**⚠️ Important:** This is not medical advice. Please consult a doctor if symptoms persist.
 """
     
     elif any(word in symptoms for word in ['bauch', 'magen', 'bauchschmerz', 'bauchweh', 'verdau', 'durchfall', 'übel', 'magenschmerz']):
@@ -220,7 +220,7 @@ def get_german_advice(symptoms):
 - Anhaltende Symptome über 3 Tage
 - Austrocknungszeichen (zu wenig Urin)
 
-**⚠️ Wichtiger Hinweis:** Dies ist keine medizinische Beratung. Bei anhaltenden Beschwerden konsultieren Sie bitte einen Arzt.
+**⚠️ Important:** This is not medical advice. Please consult a doctor if symptoms persist.
 """
     
     else:
@@ -247,7 +247,7 @@ def get_german_advice(symptoms):
 - Hohes Fieber
 - Plötzliche Verschlechterung
 
-**⚠️ Wichtiger Hinweis:** Dies ist keine medizinische Beratung. Bei unklaren oder ernsthaften Beschwerden konsultatieren Sie bitte einen Arzt.
+**⚠️ Important:** This is not medical advice. Please consult a doctor for unclear or serious symptoms.
 """
     
     return advice
