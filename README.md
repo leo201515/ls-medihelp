@@ -12,8 +12,8 @@ This app works completely **FREE** with two options:
 - Covers common symptoms in German and English
 - No registration or API required
 
-### Option 2: Hugging Face Free API (Optional)
-- Get **FREE** API key: https://huggingface.co/settings/tokens
+### Option 2: Google (Optional)
+- Get **FREE** API key
 - Uses AI model for more dynamic responses
 - Free tier: Limited requests per month
 - Add to `.env` file: `HF_API_KEY=your_key_here`
