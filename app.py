@@ -38,7 +38,8 @@ def index():
     if 'session_id' not in session:
         session['session_id'] = str(uuid.uuid4())
     session.setdefault('use_ai', True)
-    return render_template('index.html', language=session.get('language', 'en'))
+    conversation = session.get('conversation', [])
+    return render_template('index.html', language=session.get('language', 'en'), conversation=conversation)
 
 @app.route('/settings')
 def settings():
@@ -81,7 +82,8 @@ def consult():
     language = session.get('language', 'de')
     
     set_user_settings(use_ai, api_key)
-    advice = get_medical_advice(symptoms, language)
+    messages = [{"role": "user", "content": symptoms}]
+    advice = get_medical_advice(messages, language)
     consultation_id = save_consultation(session['session_id'], symptoms, advice)
     
     return jsonify({
@@ -93,6 +95,45 @@ def consult():
 def history():
     consultations = get_history(session.get('session_id', ''))
     return render_template('history.html', consultations=consultations)
+
+@app.route('/chat', methods=['POST'])
+def chat():
+    if 'session_id' not in session:
+        session['session_id'] = str(uuid.uuid4())
+
+    data = request.get_json()
+    message = data.get('message', '').strip()
+
+    if not message:
+        return jsonify({'error': 'Please enter a message'}), 400
+
+    if 'conversation' not in session:
+        session['conversation'] = []
+
+    session['conversation'].append({"role": "user", "content": message})
+
+    use_ai = session.get('use_ai', True)
+    api_key = session.get('api_key', '')
+    language = session.get('language', 'de')
+
+    set_user_settings(use_ai, api_key)
+
+    try:
+        advice = get_medical_advice(session['conversation'], language)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+    session['conversation'].append({"role": "assistant", "content": advice})
+    session.modified = True
+
+    return jsonify({
+        'reply': advice
+    })
+
+@app.route('/clear-chat', methods=['POST'])
+def clear_chat():
+    session.pop('conversation', None)
+    return jsonify({'success': True})
 
 @app.route('/download-apk')
 def download_apk():

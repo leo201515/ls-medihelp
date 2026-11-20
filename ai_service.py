@@ -16,10 +16,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-HF_API_KEY = os.getenv('HF_API_KEY', '')
-OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY', '')
-API_URL = "https://openrouter.ai/api/v1/chat/completions"
-MODEL = "nvidia/nemotron-nano-9b-v2:free"
+DEEPSEEK_API_KEY = os.getenv('DEEPSEEK_API_KEY', '')
+DEEPSEEK_API_BASE_URL = os.getenv('DEEPSEEK_API_BASE_URL', 'https://api.deepseek.com').rstrip('/')
+API_URL = f"{DEEPSEEK_API_BASE_URL}/chat/completions"
+MODEL = os.getenv('DEEPSEEK_MODEL', 'deepseek-flash')
 
 _user_settings = {'use_ai': True, 'api_key': ''}
 
@@ -28,18 +28,19 @@ def set_user_settings(use_ai, api_key):
     _user_settings['use_ai'] = use_ai if use_ai is not None else True
     _user_settings['api_key'] = api_key
 
-def get_medical_advice(symptoms, language='en'):
+def get_medical_advice(messages, language='en'):
     use_ai = _user_settings.get('use_ai', True)
-    api_key = OPENROUTER_API_KEY or _user_settings.get('api_key', '')
+    api_key = DEEPSEEK_API_KEY or _user_settings.get('api_key', '')
     
     if use_ai and api_key:
-        return get_openrouter_advice(symptoms, language == 'de', api_key)
+        return get_deepseek_advice(messages, api_key)
     
     return "Bitte konfigurieren Sie einen API-Schlüssel in den Einstellungen, um medizinische Beratung zu erhalten."
 
-def get_openrouter_advice(symptoms, is_german, api_key):
-    system_prompt = "You are a medical assistant. Give brief, helpful advice. Always recommend seeing a doctor for serious symptoms."
-    user_prompt = f"Symptoms: {symptoms}\n\nWhat helps?"
+def get_deepseek_advice(messages, api_key):
+    system_prompt = "You are a medical assistant. Give brief, helpful advice. Always recommend seeing a doctor for serious symptoms. Maintain context from the conversation history."
+    
+    full_messages = [{"role": "system", "content": system_prompt}] + messages
     
     headers = {
         "Authorization": f"Bearer {api_key}",
@@ -48,10 +49,7 @@ def get_openrouter_advice(symptoms, is_german, api_key):
     
     payload = {
         "model": MODEL,
-        "messages": [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt}
-        ],
+        "messages": full_messages,
         "max_tokens": 500
     }
     
